@@ -1,0 +1,37 @@
+Simple Router Implementation
+
+	Implemented a simple router using the following communication protocols:
+Ethernet, Ip, ICMP and ARP. 
+
+	Ethernet protocol: gives information about the source and destination mac
+adresses and specify the type of the protocol in the received packet.
+	
+	If the ethernet type is ARP:
+		- if the ARP message is a request, a reply will be sent with the wanted
+mac adress
+		- if the ARP message is a reply, the arp table will be updated and the
+remaining messages will be sent to the newly found destination
+
+	If the ethernet type is IP:
+		- if it also contains an ICMP header, is destinated to the router and
+the message is of type ECHO REQUEST, an ECHO REPLY will be sent back
+		- if the checksum is wrong, the packet will be dropped
+		- if the packet is about to expire, an ICMP error message will be sent 
+back to the source of the packet
+	
+	Forwarding process:
+		- when a packet is received, the next hop will have to be determined 
+from the route table entries:
+			- if there is no good entry in the route table, an ICMP error of 
+type DESTINATION UNREACHABLE will be sent back
+		- I will then search for the destination MAC in the arp table:
+			- if there is good entry, an ARP request will be sent, so that the
+wanted MAC adress can be found (the message is a broadcast message, thus the 
+destination MAC of this request wwill be ff:ff:ff:ff:ff:ff)
+		- if both an arp entry and route tanle entry are found, the message is 
+sent to the next destination.
+
+Bonus: tried to implement the checksum modificiation using the incremental 
+algorithm from RFC 1624 (Equation number 4). The 16-bit field value is formed
+out of the ttl field (8 bits), which is followed by the protocol field(8 bits).
+
